@@ -87,14 +87,14 @@ if __name__ == "__main__":
         ylim=(df["y"].min(), df["y"].max()),
         autoscale_on=False,
     )
-    fig, ax = plt.subplots(subplot_kw=subplot_kw)
+    fig, ax = plt.subplots(subplot_kw=subplot_kw, figsize=(30, 30))
     fig.subplots_adjust(bottom=0.25)
     ax.set_title("Lasso points, add label, then press enter")
 
-    pts = ax.scatter(df["x"], df["y"], s=50, c=df["colour"])
+    pts = ax.scatter(df["x"], df["y"], s=5, c="b")
     selector = SelectFromCollection(ax, pts)
-    archetype_df = df[df["colour"] == 0]
-    key_pts = ax.scatter(archetype_df["x"], archetype_df["y"], s=50, c="k")
+    archetype_df = df[df["colour"] != -1]
+    key_pts = ax.scatter(archetype_df["x"], archetype_df["y"], s=5, c="y")
 
     annot = ax.annotate(
         "",
@@ -105,7 +105,7 @@ if __name__ == "__main__":
         arrowprops=dict(arrowstyle="->"),
     )
     annot.set_visible(False)
-    c = np.random.randint(1, 5, size=len(df))
+    c = df["colour"].to_numpy()
     cmap = plt.cm.RdYlGn
     norm = plt.Normalize(1, 4)
     textboxintput = "No label"
@@ -113,6 +113,7 @@ if __name__ == "__main__":
     def submit(expression):
         textboxintput = str(expression)
         ax.autoscale_view()
+        ax.set_yax
         fig.canvas.draw()
 
     axbox = fig.add_axes([0.1, 0.1, 0.8, 0.075])
@@ -132,14 +133,16 @@ if __name__ == "__main__":
             df_to_show = df.iloc[selector.ind]
             print(text_box.text)
             df.loc[selector.ind, "label"] = str(text_box.text)
-            pts = ax.scatter(df_to_show["x"], df_to_show["y"], s=50, c="r")
+            pts = ax.scatter(df_to_show["x"], df_to_show["y"], s=5, c="r")
             fig.canvas.draw()
             print(df["label"].value_counts())
 
     def update_annot(ind):
         pos = pts.get_offsets()[ind["ind"][0]]
         annot.xy = pos
-        text = " ".join([df["name"][n] for n in ind["ind"]])
+        text = "\n".join(
+            [str(df["name"][n]) + " : " + str(df["class"][n]) for n in ind["ind"]]
+        )
         annot.set_text(text)
         annot.get_bbox_patch().set_facecolor(cmap(norm(c[ind["ind"][0]])))
         annot.get_bbox_patch().set_alpha(0.4)
