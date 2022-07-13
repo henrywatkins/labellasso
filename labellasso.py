@@ -5,6 +5,7 @@ import pathlib
 
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 from matplotlib.widgets import LassoSelector, TextBox, Button
 from matplotlib.path import Path
 
@@ -66,7 +67,6 @@ class SelectFromCollection:
 
 
 if __name__ == "__main__":
-    import matplotlib.pyplot as plt
 
     parser = argparse.ArgumentParser(
         description="Lasso a set of points and give them a label."
