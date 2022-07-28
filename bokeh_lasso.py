@@ -10,11 +10,12 @@ in your browser.
 
 
 import pathlib
+import random
 import numpy as np
 import pandas as pd
 from bokeh.plotting import figure, show
 
-from bokeh.palettes import Category10, Category20
+from bokeh.palettes import Category10, Category20, Turbo256
 from bokeh.io import curdoc
 from bokeh.layouts import column, row
 from bokeh.models import (
@@ -26,35 +27,59 @@ from bokeh.models import (
     CategoricalColorMapper,
 )
 from bokeh.plotting import figure
+#
+#SOURCE_DATA = "../label_lasso_entity_data_tsne_endweighted_inprogress_labelled.csv"
+SOURCE_DATA = "../lasso_entity_data_freq_label_labelled.csv"
+#SOURCE_DATA = "../lasso_entity_data_freq_label.csv"
 
-
-data_path = pathlib.Path("test.csv")
+data_path = pathlib.Path(SOURCE_DATA)
 
 filename = data_path.stem
 new_path = data_path.with_name(filename + "_labelled.csv")
 
 df = pd.read_csv(data_path, index_col=False)
 
-# df["class"] = df["class"].fillna("null")
-df["label"] = np.nan
-df["colour"] = np.nan
+
+if not ("label" in df.columns):
+    df["label"] = np.nan
+if not ("colour" in df.columns):
+    df["colour"] = np.nan
+
 df.loc[df["class"].isna(), "colour"] = "noclass"
-df.loc[~df["class"].isna(), "colour"] = "withclass"
+#df.loc[~df["class"].isna(), "colour"] = "withclass"
+df.loc[~df["class"].isna(), "colour"] = df.loc[~df["class"].isna(), "class"]
+df.loc[~df["label"].isna(), "colour"] = "labelled"
 
-
+MIN = 3
+df["x"] = df["tsne_x"]
+df["y"] = df["tsne_y"]
+df["size"] = 0.3*np.sqrt(df["frequency"])
+df.loc[df["size"]<MIN, "size"] = MIN
+print(df.sample(10))
 source = ColumnDataSource(df)
 
 hover = HoverTool(tooltips=[("Name", "@name"), ("Class", "@class")])
+#factors = ["noclass", "withclass", "labelled"]
+#cmap = Category10[len(factors)]
+factors = list(df["colour"].unique())
+factors.append("noclass")
+factors.append("labelled")
+#cmap = [c for i, c in enumerate(Turbo256) if i%len(factors)==0]
+cmap = []
+turbo = list(Turbo256)
+for i in factors:
+    colour = turbo.pop(random.randint(0,len(turbo)))
+    cmap.append(colour)
 color_mapper = CategoricalColorMapper(
-    factors=["noclass", "withclass", "labelled"], palette=Category10[3]
+    factors=factors, palette= cmap
 )
 
-TOOLS = "crosshair,pan,zoom_in,zoom_out,box_zoom,reset,save,lasso_select,"
+TOOLS = "crosshair,pan,zoom_in,zoom_out,box_zoom,reset,save,lasso_select,box_select"
 
 p = figure(tools=TOOLS, title="Scatter plot lasso labeller")
 
 p.scatter(
-    source=source, fill_alpha=0.6, color=dict(field="colour", transform=color_mapper)
+    source=source, size="size", fill_alpha=0.6, color=dict(field="colour", transform=color_mapper)
 )
 # Set up widgets
 text = TextInput(title="Input label name for selected points", value="labelname")
@@ -66,6 +91,8 @@ def add_label(attrname, old, new):
     df.loc[source.selected.indices, "label"] = text.value
     df.loc[source.selected.indices, "colour"] = "labelled"
     source.data = df
+    proportion = 100*(df.loc[~df["label"].isna(), "frequency"].sum()/df["frequency"].sum())
+    p.title.text = f"Scatter plot lasso labeller, labelled: {proportion}%"
 
 
 def save_data():
