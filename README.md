@@ -5,13 +5,13 @@ Select groups of points in a scatter plot and apply labels.
 ## Usage
 
 ```
-python labellasso.py data.csv
+bokeh serve bokeh_lasso.py
 ```
 
-## Goal
-- plot some points
-- show the name of the point when you mouse over it
-- allow you to select a group by drawing a 'lasso' around them.
-- input a label for these points, which is saved to a dataframe
-- remove these points from the plot once they are labelled
-- save the results to a csv
+This will spin up a server, simply navigate to 
+
+```
+http://localhost:5006/lasso
+```
+
+and start lassoing!
