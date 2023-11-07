@@ -5,11 +5,6 @@
 
 -----
 
-**Table of Contents**
-
-- [Installation](#installation)
-- [License](#license)
-
 ## Installation
 
 ```console
@@ -18,13 +13,13 @@ pip install labellasso
 
 ## Usage
 
-bokeh serve bokeh_lasso.py
+```console
+labellasso file.csv
+```
 
-This will spin up a server, simply navigate to
+This will spin up a server, simply navigate to http://localhost:5006 and start lassoing!
 
-http://localhost:5006/lasso
-
-and start lassoing!
+The `file.csv` should have columns `name`, `x`,`y` to be consistent with the labelling tool.
 
 ## License
 

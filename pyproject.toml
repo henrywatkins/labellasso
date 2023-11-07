@@ -9,7 +9,7 @@ description = 'A simple data-point labelling tool using scatterplot lasso'
 readme = "README.md"
 requires-python = ">=3.7"
 license = "MIT"
-keywords = []
+keywords = ["labelling","annotation"]
 authors = [
   { name = "Henry Watkins", email = "h.watkins@ucl.ac.uk" },
 ]
@@ -45,7 +45,10 @@ path = "src/labellasso/__about__.py"
 dependencies = [
   "coverage[toml]>=6.5",
   "pytest",
+  "black",
+  "isort",
 ]
 [tool.hatch.envs.default.scripts]
 test = "pytest {args:tests}"
 fmt = "black . ; isort ."
+
