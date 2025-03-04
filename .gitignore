@@ -7,7 +7,10 @@ __pycache__/
 # IDE files
 .vscode/
 .idea/
-
+.ruff_cache/
+.pytest_cache
+.venv
+CLAUDE.md
 # Distribution / packaging
 dist/
 build/
@@ -19,3 +22,5 @@ build/
 
 # Logs
 *.log
+test.csv
+.python-version
